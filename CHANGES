@@ -1,0 +1,67 @@
+CHANGES to HTTP::Async
+
+0.09 - Thu Sep 13 18:58:13 BST 2007
+
+  * added requirement for Pod::Coverage >= 0.19 if perl >= 5.9.0
+  
+  * moved polite.t test into t/ so that it gets run by the makefile.
+
+0.08 - Wed Sep 12 22:35:33 BST 2007
+
+  * Deleted Module::Build
+
+  * Removed test in bad-hosts.t that was unreliable. I think that it was failing
+    under certain proxy configs.
+
+0.07 - Sun Feb 18 15:00:46 GMT 2007
+
+  * Added proper handling of 304 responses based on code patch and test by
+    Tomohiro Ikebe from livedoor.jp
+
+0.06 - Tue Feb  6 10:48:15 GMT 2007
+
+  * Changed the request uri that is used so that it has the host in for proxy
+    requests and does not otherwise. This is to comply with the RFC for HTTP
+    ( http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1.2 ).
+
+0.05 - Fri Nov 17 08:42:49 GMT 2006
+
+  * Added ability to pass arguments to new to configure the async object.
+
+0.04 - Thu Sep 28 13:42:25 BST 2006
+
+  * Fixed stupid bug that caused the polite module to crash if the numbers of
+    requests per domain were not the same.
+
+0.03 - Wed Sep 27 11:00:14 BST 2006
+
+  * Created HTTP::Async::Polite that adds limits to the scraping to avoid over
+    stretching the domain being scraped.
+
+  * Increased the delay in poll-interval tests to stop them failing on slow
+    machines.
+
+  * Added pod tests, README and Makefile.PL in an attempt to achieve kwalitee.
+
+0.02 - Wed Sep  6 09:36:01 BST 2006 - svn r30
+
+  * Changed the timeout to be an inactivity timeout and added a
+    max_request_length to limit the amount of time that a request can be
+    running for.
+
+  * Added more diagnostics to the tests to try to find the bug that is causing
+    MIYAGAWA issues.
+
+  * Created TODO and CHANGES docs.
+
+  * Added error checking to catch connections that fail before the headers are
+    sent. (patch submitted by Egor Egorov)
+
+  * Added ability to specify proxy to use. (based on patch from Egor Egorov)
+
+  * Added 'add_with_opts' method that lets you override the default options
+    for this request.
+
+0.01 - XXXXXXXXXX - svn r24
+
+   * Initial release onto CPAN.
