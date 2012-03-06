@@ -42,7 +42,7 @@ OR do something else if there is no response ready:
             # deal with $response
         } else {
             # do something else
-        {
+        }
     }
 
 OR just use the async object to fetch stuff in the background and deal with
@@ -649,7 +649,16 @@ sub _send_request {
     $args{PeerAddr} ||= $uri->host;
     $args{PeerPort} ||= $uri->port;
 
-    my $s = eval { Net::HTTP::NB->new(%args) };
+    my $net_http_class = 'Net::HTTP::NB';
+    if ($uri->scheme and $uri->scheme eq 'https') {
+        $net_http_class = 'Net::HTTPS::NB';
+        eval {
+            require Net::HTTPS::NB;
+            Net::HTTPS::NB->import();
+        };
+        die "$net_http_class must be installed for https support" if $@;
+    }
+    my $s = eval { $net_http_class->new(%args) };
 
     # We could not create a request - fake up a 503 response with
     # error as content.
@@ -763,6 +772,7 @@ by domain so that the remote server is not overloaded.
 =head1 GOTCHAS
 
 The responses may not come back in the same order as the requests were made.
+For https requests to work, you must have L<Net::HTTPS::NB> installed.
 
 =head1 THANKS
 
