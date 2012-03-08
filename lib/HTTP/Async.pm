@@ -3,7 +3,7 @@ use warnings;
 
 package HTTP::Async;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp;
 use Data::Dumper;
@@ -781,6 +781,14 @@ before headers sent and more.
 
 Tomohiro Ikebe from livedoor.jp submitted patches (and a test) to properly
 handle 304 responses.
+
+Naveed Massjouni for adding the https handling code.
+
+=head1 BUGS AND REPO
+
+Please submit all bugs, patches etc on github
+
+L<https://github.com/evdb/HTTP-Async>
 
 =head1 AUTHOR
 
