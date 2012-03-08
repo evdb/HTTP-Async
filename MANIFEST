@@ -1,5 +1,4 @@
 CHANGES
-diffs/connect.timeout.diff
 lib/HTTP/Async.pm
 lib/HTTP/Async/Polite.pm
 Makefile.PL
