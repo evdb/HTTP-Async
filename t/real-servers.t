@@ -11,8 +11,8 @@ use Time::HiRes 'usleep';
 
 # Create requests for a few well known sites.
 my @requests =
-  map { HTTP::Request->new( GET => "http://www.$_" ) }
-  sort qw( google.com yahoo.com ecclestoad.co.uk );
+  map { HTTP::Request->new( GET => $_ ) }
+  sort qw( http://www.google.com http://www.yahoo.com https://www.gandi.net/ );
 
 my $tests_per_request = 4;
 plan tests => 3 + $tests_per_request * scalar @requests;
