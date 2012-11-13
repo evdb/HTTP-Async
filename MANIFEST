@@ -3,7 +3,7 @@ lib/HTTP/Async.pm
 lib/HTTP/Async/Polite.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 t/bad-connections.t
 t/bad-headers.t
 t/bad-hosts.t

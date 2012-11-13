@@ -1,5 +1,10 @@
 CHANGES to HTTP::Async
 
+0.11 - 2012/11/13
+
+  * Use high ports to prevent test failure when 8080 is already used
+  * Travis config
+
 0.10 - 2012/03/08
 
   * added support for https requests - thanks Naveed Massjouni
