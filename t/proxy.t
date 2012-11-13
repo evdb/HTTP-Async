@@ -11,6 +11,7 @@ my $s1          = TestServer->new(8080);
 my $s1_url_root = $s1->started_ok("starting a test server");
 
 my $s2          = TestServer->new(8081);
+$s2->{is_proxy} = 1;
 my $s2_url_root = $s2->started_ok("starting a test server");
 
 ok( $_, "got $_" ) for $s1_url_root, $s2_url_root;

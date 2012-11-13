@@ -15,7 +15,7 @@ sub handle_request {
 
     # If we are on port 8081 then we are a proxy - we should forward the
     # requests.
-    return act_as_proxy(@_) if $self->port == 8081;
+    return act_as_proxy(@_) if $self->{is_proxy};
 
     # We should act as a final destination server and so expect an absolute URL.
     my $request_uri = $ENV{REQUEST_URI};
