@@ -46,7 +46,7 @@ is $q->max_redirects, 7, "max_redirects == 7";
     is $res->code, 302, "Still a redirect";
     ok $res->previous, "Has a previous reponse";
     is $res->previous->code, 302, "previous request was a redirect";
-    is $res->request->uri->as_string, 'http://localhost:8080?redirect=13',
+    is $res->request->uri->as_string, "$url_root?redirect=13",
       "last request url correct";
 }
 

@@ -9,6 +9,14 @@ use Time::HiRes qw(sleep time);
 use Data::Dumper;
 use LWP::UserAgent;
 
+sub new {
+    my ($class, $port) = @_;
+    
+    $port ||= 10_249; # randomish port
+    
+    return $class->SUPER::new($port);
+}
+
 sub handle_request {
     my ( $self, $cgi ) = @_;
     my $params = $cgi->Vars;
