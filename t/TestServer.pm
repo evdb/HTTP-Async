@@ -135,7 +135,7 @@ sub act_as_proxy {
     # that this is the case.
     #
     #   http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1.2
-    if ( $request_uri !~ m!^http://! ) {
+    if ( $request_uri !~ m!^https?://! ) {
         warn "ERROR - not fully qualified request_uri '$request_uri'";
         return;
     }
