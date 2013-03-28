@@ -650,13 +650,22 @@ sub _send_request {
     $args{PeerPort} ||= $uri->port;
 
     my $net_http_class = 'Net::HTTP::NB';
-    if ($uri->scheme and $uri->scheme eq 'https') {
+    if ($uri->scheme and $uri->scheme eq 'https' and not $request_is_to_proxy) {
         $net_http_class = 'Net::HTTPS::NB';
         eval {
             require Net::HTTPS::NB;
             Net::HTTPS::NB->import();
         };
         die "$net_http_class must be installed for https support" if $@;
+    }
+    elsif($uri->scheme and $uri->scheme eq 'https' and $request_is_to_proxy) {
+        # We are making an HTTPS request through an HTTP proxy such as squid.
+        # The proxy will handle the HTTPS, we need to connect to it via HTTP
+        # and then make a request where the https is clear from the scheme...
+        $args{Host} = sprintf(
+            '%s:%s',
+            delete @args{'PeerAddr', 'PeerPort'}
+        );
     }
     my $s = eval { $net_http_class->new(%args) };
 
