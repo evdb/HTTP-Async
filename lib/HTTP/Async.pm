@@ -793,6 +793,8 @@ handle 304 responses.
 
 Naveed Massjouni for adding the https handling code.
 
+Alex Balhatchet for adding the https + proxy handling code.
+
 =head1 BUGS AND REPO
 
 Please submit all bugs, patches etc on github
