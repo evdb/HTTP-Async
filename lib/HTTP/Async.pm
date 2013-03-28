@@ -3,7 +3,7 @@ use warnings;
 
 package HTTP::Async;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
 use Data::Dumper;
