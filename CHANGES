@@ -1,5 +1,9 @@
 CHANGES to HTTP::Async
 
+0.13 - 2013/03/29
+
+  * Fixed t/real-servers.t to work whether or not Net::HTTPS::NB is available
+
 0.12 - 2013/03/29
 
   * New logic for making https requests through a proxy
