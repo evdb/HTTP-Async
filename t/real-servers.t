@@ -9,6 +9,9 @@ plan skip_all => "enable these tests by setting REAL_SERVERS"
 use HTTP::Request;
 use Time::HiRes 'usleep';
 
+use IO::Socket::SSL;
+IO::Socket::SSL::set_defaults(SSL_verify_mode => 0); # SSL_VERIFY_NONE
+
 # Create requests for a few well known sites.
 my @requests =
   map { HTTP::Request->new( GET => $_ ) }
