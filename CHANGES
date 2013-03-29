@@ -1,8 +1,11 @@
 CHANGES to HTTP::Async
 
-0.12 - 2013/03/28
+0.12 - 2013/03/29
 
-  * New logic for making https requests through a proxy - thanks Alex Balhatchet
+  * New logic for making https requests through a proxy
+  * Made tests run ok in parallel by using different ports per test
+  * Set explicit SSL_verify_mode in real-servers.t
+  * Minor update to code comment about is_proxy mode
 
 0.11 - 2012/11/13
 
