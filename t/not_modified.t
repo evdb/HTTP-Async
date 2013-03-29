@@ -7,7 +7,7 @@ use HTTP::Async;
 
 require 't/TestServer.pm';
 
-my $s        = TestServer->new;
+my $s        = TestServer->new(81000);
 my $url_root = $s->started_ok("starting a test server");
 
 my $q = HTTP::Async->new;

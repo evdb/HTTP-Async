@@ -11,7 +11,7 @@ BEGIN {
 }
 
 require 't/TestServer.pm';
-my $s        = TestServer->new;
+my $s        = TestServer->new(80100);
 my $url_root = $s->started_ok("starting a test server");
 
 use HTTP::Async;

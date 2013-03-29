@@ -7,10 +7,10 @@ use Test::More tests => 16;
 use HTTP::Request;
 
 require 't/TestServer.pm';
-my $s1          = TestServer->new(10249);
+my $s1          = TestServer->new(80500);
 my $s1_url_root = $s1->started_ok("starting a test server");
 
-my $s2          = TestServer->new(10250);
+my $s2          = TestServer->new(80501);
 $s2->{is_proxy} = 1;
 my $s2_url_root = $s2->started_ok("starting a test server");
 
@@ -30,7 +30,7 @@ foreach my $via_proxy ( 0, 1 ) {
 
         my $req = HTTP::Request->new( 'GET', $url );
 
-        my %opts = ( proxy_host => '127.0.0.1', proxy_port => 10250, );
+        my %opts = ( proxy_host => '127.0.0.1', proxy_port => 80501, );
 
         my $id =
             $via_proxy

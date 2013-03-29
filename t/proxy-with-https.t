@@ -15,7 +15,7 @@ if ($@) {
 
 plan tests => 5;
 
-my $s1          = TestServer->new(10249);
+my $s1          = TestServer->new(80400);
 $s1->{is_proxy} = 1;
 my $s1_url_root = $s1->started_ok("starting a test server");
 
@@ -32,7 +32,7 @@ while ( my ( $url, $code ) = each %tests ) {
 
     my $req = HTTP::Request->new( 'GET', $url );
 
-    my %opts = ( proxy_host => '127.0.0.1', proxy_port => 10249, );
+    my %opts = ( proxy_host => '127.0.0.1', proxy_port => 80400, );
 
     my $id = $q->add_with_opts( $req, \%opts );
 

@@ -12,7 +12,11 @@ use LWP::UserAgent;
 sub new {
     my ($class, $port) = @_;
     
-    $port ||= 10_249; # randomish port
+    # Require a port parameter to be passed in.
+    # Any default here would mean the tests don't run properly in parallel.
+    if (!$port) {
+        die "Missing positional parameter 'port' required";
+    }
     
     return $class->SUPER::new($port);
 }
