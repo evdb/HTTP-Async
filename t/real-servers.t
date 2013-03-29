@@ -9,12 +9,20 @@ plan skip_all => "enable these tests by setting REAL_SERVERS"
 use HTTP::Request;
 use Time::HiRes 'usleep';
 
-use IO::Socket::SSL;
-IO::Socket::SSL::set_defaults(SSL_verify_mode => 0); # SSL_VERIFY_NONE
+my $https_ok;
+eval "use Net::HTTPS::NB";
+if ($@) {
+    note "Install Net::HTTPS::NB to test https";
+}
+else {
+    $https_ok = 1;
+    IO::Socket::SSL::set_defaults(SSL_verify_mode => 0); # SSL_VERIFY_NONE
+}
 
 # Create requests for a few well known sites.
 my @requests =
   map { HTTP::Request->new( GET => $_ ) }
+  grep { $https_ok || $_ !~ m{^https://} }
   sort qw( http://www.google.com http://www.yahoo.com https://www.gandi.net/ );
 
 my $tests_per_request = 4;
