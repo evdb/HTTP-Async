@@ -30,3 +30,7 @@ TODOs for HTTP::Async
   * Add 'info' sub that can be linked to SIGINFO to provide a summary of what is
     going on eg "print $async->info( 'terse' )".
 
+  * Add logic to TestServer::new() to choose a different port when it finds the
+    one it wants is already in use. Related: make tests which refer to port
+    numbers outside of their call to TestServer::new() get them from the
+    TestServer object instead of hard-coding them.
