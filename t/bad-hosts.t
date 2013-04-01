@@ -21,8 +21,16 @@ ok $q->add(@bad_requests), "Added bad requests";
 while ( $q->not_empty ) {
     my $res = $q->next_response || next;
 
-    isa_ok $res, 'HTTP::Response', "Got a proper response";
-    ok !$res->is_success, "Response was not a success";
-    ok $res->is_error, "Response was an error";
-    ok $res->request,  "response has a request attached.";
+    my $request_uri = $res->request->uri;
+
+    isa_ok($res, 'HTTP::Response', "$request_uri - Got a proper response")
+        || diag sprintf("ref: %s", ref $res);
+
+    ok(!$res->is_success, "$request_uri - Response was not a success")
+        || diag sprintf("%s: %s", $res->code, $res->decoded_content);
+
+    ok($res->is_error, "$request_uri - Response was an error")
+        || diag sprintf("%s: %s", $res->code, $res->decoded_content);
+
+    ok $res->request,  "$request_uri - Response has a request attached";
 }
