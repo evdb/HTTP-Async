@@ -1,5 +1,9 @@
 CHANGES to HTTP::Async
 
+0.14 - 2013/04/01
+
+  * More diagnostics in bad-hosts.t on failure
+
 0.13 - 2013/03/29
 
   * Fixed t/real-servers.t to work whether or not Net::HTTPS::NB is available
