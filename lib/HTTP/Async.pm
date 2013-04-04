@@ -741,16 +741,7 @@ sub _make_url_absolute {
     my $in  = $args{url};
     my $ref = $args{ref};
 
-    return $in if $in =~ m{ \A http:// }xms;
-
-    my $ret = $ref->scheme . '://' . $ref->authority;
-    return $ret . $in if $in =~ m{ \A / }xms;
-
-    $ret .= $ref->path;
-    return $ret . $in if $in =~ m{ \A [\?\#\;] }xms;
-
-    $ret =~ s{ [^/]+ \z }{}xms;
-    return $ret . $in;
+    return URI->new_abs($in, $ref)->as_string;
 }
 
 sub _add_error_response_to_return {
