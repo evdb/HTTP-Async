@@ -684,7 +684,10 @@ sub _send_request {
         return 1;
     }
 
-    my %headers = %{ $request->{_headers} };
+    my %headers;
+    for my $key ($request->{_headers}->header_field_names) {
+        $headers{$key} = $request->header($key);
+    }
 
     # Decide what to use as the request_uri
     my $request_uri = $request_is_to_proxy    # is this a proxy request....
