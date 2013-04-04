@@ -790,6 +790,9 @@ Naveed Massjouni for adding the https handling code.
 Alex Balhatchet for adding the https + proxy handling code, and for making the
 tests run ok in parallel.
 
+Josef Toman for fixing two bugs, one related to header handling and another
+related to producing an absolute URL correctly.
+
 =head1 BUGS AND REPO
 
 Please submit all bugs, patches etc on github
