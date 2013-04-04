@@ -1,5 +1,11 @@
 CHANGES to HTTP::Async
 
+0.15 - 2013/04/04
+
+  * Two bug fixes provided by Josef Toman:
+    * Fixed header handling to use header_field_names()
+    * Replaced _make_url_absolute with URI::new_abs()
+
 0.14 - 2013/04/01
 
   * More diagnostics in bad-hosts.t on failure
