@@ -1,5 +1,9 @@
 CHANGES to HTTP::Async
 
+0.16 - 2013/04/04
+
+  * Fixed CPAN Testers bug in bad-hosts.t
+
 0.15 - 2013/04/04
 
   * Two bug fixes provided by Josef Toman:
