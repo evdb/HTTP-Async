@@ -79,7 +79,9 @@ C<select> lists.
 =head1 Default settings:
 
 There are a number of default settings that should be suitable for most uses.
-However in some circumstances you might wish to change these.
+However in some circumstances you might wish to change these. 'cookie_jar',
+if defined, is expected to be similar to C<HTTP::Cookies>, with
+extract_cookies and add_cookie_header methods.
 
             slots: 20
           timeout: 180 (seconds)
@@ -88,6 +90,7 @@ However in some circumstances you might wish to change these.
     poll_interval: 0.05 (seconds)
        proxy_host: ''
        proxy_port: ''
+       cookie_jar: undef
        
 =head1 METHODS
 
@@ -110,6 +113,7 @@ sub new {
             timeout          => 180,
             max_request_time => 300,
             poll_interval    => 0.05,
+            cookie_jar       => undef,
         },
 
         id_opts => {},
@@ -136,7 +140,7 @@ sub _init {
 
 sub _next_id { return ++$_[0]->{current_id} }
 
-=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host and proxy_port
+=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host, proxy_port and cookie_jar
 
     $old_value = $async->slots;
     $new_value = $async->slots( $new_value );
@@ -150,7 +154,7 @@ Slots is the maximum number of parallel requests to make.
 
 my %GET_SET_KEYS = map { $_ => 1 } qw( slots poll_interval
   timeout max_request_time max_redirects
-  proxy_host proxy_port );
+  proxy_host proxy_port cookie_jar );
 
 sub _add_get_set_key {
     my $class = shift;
@@ -525,17 +529,29 @@ sub _process_in_progress {
 
             my $response = HTTP::Response->new(
                 @$tmp{ 'code', 'message', 'headers', 'content' } );
+            my $code = $response->code;
+            my $get_or_head = $hashref->{request}->method =~ m{^(?:GET|HEAD)$};
 
             $response->request( $hashref->{request} );
             $response->previous( $hashref->{previous} ) if $hashref->{previous};
 
+            my $jar = $self->_get_opt( 'cookie_jar', $id );
+            if ( defined $jar ) {
+                $jar->extract_cookies( $response );
+            }
+
             # If it was a redirect and there are still redirects left
             # create a new request and unshift it onto the 'to_send'
-            # array.
+            # array. Only redirect GET and HEAD as per RFC  2616.
+            #
+            #   http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
             if (
                 $response->is_redirect            # is a redirect
                 && $hashref->{redirects_left} > 0 # and we still want to follow
-                && $response->code != 304         # not a 'not modified' reponse
+                && ($get_or_head
+                    || ($code != 301 && $code != 302 && $code != 307))
+                && $code != 304         # not a 'not modified' response
+                && $code != 305         # not a 'use proxy' response
               )
             {
 
@@ -549,7 +565,29 @@ sub _process_in_progress {
 
                 my $url = _make_url_absolute( url => $loc, ref => $uri );
 
-                my $request = HTTP::Request->new( 'GET', $url );
+                my $request = $hashref->{request}->clone;
+                $request->uri( $url );
+
+                # These headers should never be forwarded
+                $request->remove_header( 'Host', 'Cookie' );
+
+                # Don't leak private information.
+                #
+                #   http://www.w3.org/Protocols/rfc2616/rfc2616-sec15.html#sec15.1.3
+                if ( $request->header( 'Referer' )
+		     && $hashref->{request}->uri->scheme eq 'https'
+		     && $request->uri->scheme eq 'http' )
+                {
+                    $request->remove_header( 'Referer' );
+                }
+
+                # See Other should use GET
+                if ($code == 303 && !$get_or_head)
+                {
+                    $request->method( 'GET' );
+                    $request->content( '' );
+                    $request->remove_content_headers;
+                }
 
                 $self->_send_request( [ $request, $id ] );
                 $hashref->{previous} = $response;
@@ -631,6 +669,12 @@ sub _send_request {
     my $uri = URI->new( $request->uri );
 
     my %args = ();
+
+    # Get cookies from jar if defined
+    my $jar = $self->_get_opt( 'cookie_jar', $id );
+    if (defined $jar) {
+        $jar->add_cookie_header( $request );
+    }
 
     # We need to use a different request_uri for proxied requests. Decide to use
     # this if a proxy port or host is set.
