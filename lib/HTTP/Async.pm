@@ -88,6 +88,8 @@ However in some circumstances you might wish to change these.
     poll_interval: 0.05 (seconds)
        proxy_host: ''
        proxy_port: ''
+        LocalAddr:
+        LocalPort:
        
 =head1 METHODS
 
@@ -136,7 +138,7 @@ sub _init {
 
 sub _next_id { return ++$_[0]->{current_id} }
 
-=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host and proxy_port
+=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host, proxy_port, LocalAddr, LocalPort
 
     $old_value = $async->slots;
     $new_value = $async->slots( $new_value );
@@ -150,7 +152,7 @@ Slots is the maximum number of parallel requests to make.
 
 my %GET_SET_KEYS = map { $_ => 1 } qw( slots poll_interval
   timeout max_request_time max_redirects
-  proxy_host proxy_port );
+  proxy_host proxy_port LocalAddr LocalPort);
 
 sub _add_get_set_key {
     my $class = shift;
@@ -639,7 +641,9 @@ sub _send_request {
     $args{Host}     = $uri->host;
     $args{PeerAddr} = $self->_get_opt( 'proxy_host', $id );
     $args{PeerPort} = $self->_get_opt( 'proxy_port', $id );
-
+    $args{LocalAddr} = $self->_get_opt( 'LocalAddr', $id );
+    $args{LocalPort} = $self->_get_opt( 'LocalPort', $id );
+    
     my $request_is_to_proxy =
       ( $args{PeerAddr} || $args{PeerPort} )    # if either are set...
       ? 1                                       # ...then we are a proxy request
