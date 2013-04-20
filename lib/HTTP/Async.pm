@@ -797,6 +797,8 @@ tests run ok in parallel.
 Josef Toman for fixing two bugs, one related to header handling and another
 related to producing an absolute URL correctly.
 
+Github user 'c00ler-' for adding LocalAddr and LocalPort support.
+
 =head1 BUGS AND REPO
 
 Please submit all bugs, patches etc on github
