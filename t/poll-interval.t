@@ -7,7 +7,7 @@ use HTTP::Request;
 use Time::HiRes 'time';
 
 BEGIN {
-    require 't/test_utils.pl';
+    require 't/test-utils.pl';
 }
 
 require 't/TestServer.pm';
