@@ -1,5 +1,11 @@
 CHANGES to HTTP::Async
 
+0.17 - 2013/04/20
+
+  * Added local_addr and local_port support
+  * Standardised test names
+  * Added THANKS for github user c00ler-
+
 0.16 - 2013/04/04
 
   * Fixed CPAN Testers bug in bad-hosts.t
