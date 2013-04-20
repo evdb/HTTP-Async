@@ -1,0 +1,37 @@
+use strict;
+use warnings;
+
+use Test::More;
+use HTTP::Request;
+
+unless(eval("require Sys::HostIP;") && !$@) {
+    plan skip_all => "test requires Sys::HostIP to be installed";
+    exit;
+}
+
+my $ips = Sys::HostIP->new->ips || [];
+
+plan tests => 1 + 2*@$ips;
+
+require 't/TestServer.pm';
+my $s        = TestServer->new(83000);
+my $url_root = $s->started_ok("starting a test server");
+
+use HTTP::Async;
+
+for my $ip (@$ips) {
+    my $q = HTTP::Async->new;
+
+    my $req = HTTP::Request->new( 'GET', "$url_root?delay=0" );
+
+    my %opts = (
+        local_addr => $ip,
+        local_port => '83001',
+    );
+    ok $q->add_with_opts($req, \%opts), "Added request to the queue with local_addr ($ip) set";
+#   note `lsof -p $$`;
+    $q->poke while !$q->to_return_count;
+
+    my $res = $q->next_response;
+    is $res->code, 200, "Got a response";
+}
