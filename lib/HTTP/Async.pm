@@ -245,7 +245,7 @@ sub add_with_opts {
     $async->poke;
 
 At fairly frequent intervals some housekeeping needs to performed - such as
-reading recieved data and starting new requests. Calling C<poke> lets the
+reading received data and starting new requests. Calling C<poke> lets the
 object do this and then return quickly. Usually you will not need to use this
 as most other methods do it for you.
 
