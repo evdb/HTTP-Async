@@ -799,6 +799,8 @@ related to producing an absolute URL correctly.
 
 Github user 'c00ler-' for adding LocalAddr and LocalPort support.
 
+rt.cpan.org user 'Florian (fschlich)' for typo in documentation.
+
 =head1 BUGS AND REPO
 
 Please submit all bugs, patches etc on github
