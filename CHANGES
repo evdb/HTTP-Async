@@ -1,5 +1,10 @@
 CHANGES to HTTP::Async
 
+0.18 - 2013/05/27
+
+  * Fixed typo in POD
+  - Added THANKS for Florian (fschlich)
+
 0.17 - 2013/04/20
 
   * Added local_addr and local_port support
