@@ -1,5 +1,10 @@
 CHANGES to HTTP::Async
 
+0.19 - 2013/07/17
+  * Added ssl_options support
+  * Increased Net::HTTPS::NB requirement to 0.13
+  - Thanks to Heikki Vatiainen for the patch
+
 0.18 - 2013/05/27
 
   * Fixed typo in POD
