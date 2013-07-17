@@ -16,7 +16,6 @@ if ($@) {
 }
 else {
     $https_ok = 1;
-    IO::Socket::SSL::set_defaults(SSL_verify_mode => 0); # SSL_VERIFY_NONE
 }
 
 # Create requests for a few well known sites.
@@ -30,7 +29,7 @@ plan tests => 3 + $tests_per_request * scalar @requests;
 
 use_ok 'HTTP::Async';
 
-my $q = HTTP::Async->new;
+my $q = HTTP::Async->new(ssl_options => { SSL_verify_mode => 0 });
 isa_ok $q, 'HTTP::Async';
 
 # Put all of these onto the queue.

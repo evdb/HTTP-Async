@@ -81,15 +81,16 @@ C<select> lists.
 There are a number of default settings that should be suitable for most uses.
 However in some circumstances you might wish to change these.
 
-            slots: 20
-          timeout: 180 (seconds)
- max_request_time: 300 (seconds)
-    max_redirects: 7
-    poll_interval: 0.05 (seconds)
-       proxy_host: ''
-       proxy_port: ''
-       local_addr: ''
-       local_port: ''
+            slots:  20
+          timeout:  180 (seconds)
+ max_request_time:  300 (seconds)
+    max_redirects:  7
+    poll_interval:  0.05 (seconds)
+       proxy_host:  ''
+       proxy_port:  ''
+       local_addr:  ''
+       local_port:  ''
+       ssl_options: {}
        
 =head1 METHODS
 
@@ -138,7 +139,7 @@ sub _init {
 
 sub _next_id { return ++$_[0]->{current_id} }
 
-=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host, proxy_port, local_addr, local_port
+=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host, proxy_port, local_addr, local_port, ssl_options
 
     $old_value = $async->slots;
     $new_value = $async->slots( $new_value );
@@ -152,7 +153,7 @@ Slots is the maximum number of parallel requests to make.
 
 my %GET_SET_KEYS = map { $_ => 1 } qw( slots poll_interval
   timeout max_request_time max_redirects
-  proxy_host proxy_port local_addr local_port);
+  proxy_host proxy_port local_addr local_port ssl_options);
 
 sub _add_get_set_key {
     my $class = shift;
@@ -661,6 +662,10 @@ sub _send_request {
             Net::HTTPS::NB->import();
         };
         die "$net_http_class must be installed for https support" if $@;
+
+        # Add SSL options, if any, to args
+        my $ssl_options = $self->_get_opt('ssl_options');
+        @args{ keys %$ssl_options } = values %$ssl_options if $ssl_options;
     }
     elsif($uri->scheme and $uri->scheme eq 'https' and $request_is_to_proxy) {
         # We are making an HTTPS request through an HTTP proxy such as squid.
@@ -800,6 +805,8 @@ related to producing an absolute URL correctly.
 Github user 'c00ler-' for adding LocalAddr and LocalPort support.
 
 rt.cpan.org user 'Florian (fschlich)' for typo in documentation.
+
+Heikki Vatiainen for the ssl_options support patch.
 
 =head1 BUGS AND REPO
 

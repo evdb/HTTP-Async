@@ -18,6 +18,7 @@ WriteMakefile(
         'LWP::UserAgent'             => 0,
         'Net::HTTP'                  => 0,
         'Net::HTTP::NB'              => 0,
+        'Net::HTTPS::NB'             => 0.13,
         'Test::HTTP::Server::Simple' => 0,
         'Test::More'                 => 0,
         'Time::HiRes'                => 0,
