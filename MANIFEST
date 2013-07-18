@@ -1,5 +1,5 @@
 .travis.yml
-CHANGES
+Changes
 lib/HTTP/Async.pm
 lib/HTTP/Async/Polite.pm
 Makefile.PL
@@ -21,6 +21,7 @@ t/proxy-with-https.t
 t/proxy.t
 t/real-servers.t
 t/redirects.t
+t/release-cpan-changes.t
 t/setup.t
 t/strip-host-from-uri.t
 t/template.t
