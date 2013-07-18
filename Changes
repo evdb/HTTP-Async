@@ -1,5 +1,12 @@
 CHANGES to HTTP::Async
 
+0.20 2013/07/18
+
+  * Updates Changes file to meet CPAN::Changes::Spec
+    * Changed and standardized date formats
+    * Changed name from CHANGES to Changes
+    * Added author/release test to check this going forward
+
 0.19 2013/07/17
 
   * Added ssl_options support
