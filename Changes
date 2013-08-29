@@ -1,5 +1,10 @@
 CHANGES to HTTP::Async
 
+0.21 2013/08/29
+
+  * Updated Changes file to meet CPAN::Changes::Spec
+    * FIxed unparseable date for version 0.02
+
 0.20 2013/07/18
 
   * Updates Changes file to meet CPAN::Changes::Spec
