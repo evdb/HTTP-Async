@@ -101,7 +101,7 @@ CHANGES to HTTP::Async
 
   * Added pod tests, README and Makefile.PL in an attempt to achieve kwalitee.
 
-0.02 - Wed Sep  6 09:36:01 BST 2006 - svn r30
+0.02 2006/09/06
 
   * Changed the timeout to be an inactivity timeout and added a
     max_request_length to limit the amount of time that a request can be
