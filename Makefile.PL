@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'         => 'HTTP::Async',
     'VERSION_FROM' => 'lib/HTTP/Async.pm',
-    LICENSE      => 'perl',
+    LICENSE        => 'perl',
     'PREREQ_PM'    => {
         'Carp'                       => 0,
         'Data::Dumper'               => 0,
@@ -24,5 +24,10 @@ WriteMakefile(
         'Time::HiRes'                => 0,
         'URI'                        => 0,
         'URI::Escape'                => 0,
+    },
+    META_MERGE    => {
+        resources => {
+            repository => 'https://github.com/evdb/HTTP-Async',
+        },
     },
 );
