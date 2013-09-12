@@ -1,5 +1,10 @@
 CHANGES to HTTP::Async
 
+0.22 2013/09/12
+
+  * Added repository cpan metadata to Makefile.PL
+  - Thanks to David Steinbrunner for the patch
+
 0.21 2013/08/29
 
   * Updated Changes file to meet CPAN::Changes::Spec
