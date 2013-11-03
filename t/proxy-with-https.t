@@ -3,6 +3,10 @@ use warnings;
 use URI::Escape;
 
 use Test::More;
+
+plan skip_all => "enable these tests by setting REAL_SERVERS"
+  unless $ENV{REAL_SERVERS};
+
 use HTTP::Request;
 
 require 't/TestServer.pm';
