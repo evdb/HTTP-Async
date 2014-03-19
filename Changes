@@ -1,5 +1,10 @@
 CHANGES to HTTP::Async
 
+0.24 2014/03/19
+
+  * Better POD docs for the counting methods
+  - Requested by Dave Hodgkinson via rt.cpan.org
+
 0.23 2013/11/03
 
   * Added REAL_SERVERS check to t/proxy-with-https.t
