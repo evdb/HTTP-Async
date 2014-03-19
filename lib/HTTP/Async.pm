@@ -337,22 +337,57 @@ sub _next_response {
       : $resp_and_id->[0];
 }
 
-=head2 to_send_count, to_return_count, in_progress_count and total_count
+=head2 to_send_count
 
     my $pending = $async->to_send_count;
 
-Returns the number of items in the various stages of processing.
+Returns the number of items which have been added but have not yet started being processed.
 
 =cut
 
-sub to_send_count   { my $s = shift; $s->poke; scalar @{ $$s{to_send} }; }
-sub to_return_count { my $s = shift; $s->poke; scalar @{ $$s{to_return} }; }
+sub to_send_count {
+    my $self = shift;
+    $self->poke;
+    return scalar @{ $self->{to_send} };
+}
+
+=head2 to_return_count
+
+    my $completed = $async->to_return_count;
+
+Returns the number of items which have completed transferring, and are waiting to be returned by next_response().
+
+=cut
+
+sub to_return_count {
+    my $self = shift;
+    $self->poke;
+    return scalar @{ $self->{to_return} };
+}
+
+=head2 in_progress_count
+
+    my $running = $async->in_progress_count;
+
+Returns the number of items which are currently being processed asynchronously.
+
+=cut
 
 sub in_progress_count {
-    my $s = shift;
-    $s->poke;
-    scalar keys %{ $$s{in_progress} };
+    my $self = shift;
+    $self->poke;
+    return scalar keys %{ $self->{in_progress} };
 }
+
+=head2 total_count
+
+    my $total = $async->total_count;
+
+Returns the sum of the to_send_count, in_progress_count and to_return_count.
+
+This should be the total number of items which have been added that have not yet been returned by next_response().
+
+=cut
 
 sub total_count {
     my $self = shift;
