@@ -2,8 +2,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More;
 use HTTP::Request;
+
+my $tests = 21;
+if ($ENV{'REAL_SERVERS'}) {
+    $tests += 4;
+}
+plan tests => $tests;
 
 require 't/TestServer.pm';
 my $s        = TestServer->new(80200);
@@ -78,4 +84,25 @@ is $q->max_redirects, 7, "max_redirects == 7";
     my $res = $q->next_response;
     is $res->code, 302, "No longer a redirect";
     ok !$res->previous, "Have no previous reponse";
+}
+
+if ($ENV{'REAL_SERVERS'}) {
+    # Check that redirects have their headers repeated
+    # Exmaple from kloevschall (https://github.com/evdb/HTTP-Async/issues/8)
+
+    is $q->max_redirects(1), 1, "Set the max_redirects to one.";
+    is $q->max_redirects, 1, "max_redirects is set to one.";
+
+    my $headers = HTTP::Headers->new(Accept => 'application/x-research-info-systems');
+
+    my $error = $q->add(HTTP::Request->new(GET => 'http://dx.doi.org/10.1126/science.169.3946.635', $headers));
+    my $ok = $q->add(HTTP::Request->new(GET => 'http://data.crossref.org/10.1126%2Fscience.169.3946.635', $headers));
+
+    while (my ($response, $req_id) = $q->wait_for_next_response) {
+        ok $response->is_success, sprintf("Got good response (%s, %s) for %s",
+            $response->code,
+            $response->message,
+            $response->base
+        );
+    }
 }

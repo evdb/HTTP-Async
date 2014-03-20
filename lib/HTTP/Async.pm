@@ -646,7 +646,8 @@ sub _process_in_progress {
 
                 my $url = _make_url_absolute( url => $loc, ref => $uri );
 
-                my $request = HTTP::Request->new( 'GET', $url );
+                my $headers = $response->request->headers;
+                my $request = HTTP::Request->new( 'GET', $url, $headers );
 
                 $self->_send_request( [ $request, $id ] );
                 $hashref->{previous} = $response;
