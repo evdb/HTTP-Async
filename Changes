@@ -1,5 +1,16 @@
 CHANGES to HTTP::Async
 
+0.25 2014/03/20
+
+  * Added remove($id) and remove_all() methods
+    Thanks go to rt.cpan.org user Ikegami
+  * Added support for forwarding headers on redirect
+    Thanks to Github users kloevschall and kaol
+  * Added support for having an HTTP::Cookies cookie jar object
+    Thanks again to Github user kaol
+  * Use Net::EmptyPort for the TestServer in the tests
+    Thanks to Github user and all around great Perl Monger DrHyde
+
 0.24 2014/03/19
 
   * Better POD docs for the counting methods
