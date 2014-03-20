@@ -91,6 +91,9 @@ However in some circumstances you might wish to change these.
        local_addr:  ''
        local_port:  ''
        ssl_options: {}
+       cookie_jar:  undef
+
+If defined, is expected to be similar to C<HTTP::Cookies>, with extract_cookies and add_cookie_header methods.
        
 =head1 METHODS
 
@@ -113,6 +116,7 @@ sub new {
             timeout          => 180,
             max_request_time => 300,
             poll_interval    => 0.05,
+            cookie_jar       => undef,
         },
 
         id_opts => {},
@@ -139,7 +143,7 @@ sub _init {
 
 sub _next_id { return ++$_[0]->{current_id} }
 
-=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host, proxy_port, local_addr, local_port, ssl_options
+=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host, proxy_port, local_addr, local_port, ssl_options, cookie_jar
 
     $old_value = $async->slots;
     $new_value = $async->slots( $new_value );
@@ -153,7 +157,7 @@ Slots is the maximum number of parallel requests to make.
 
 my %GET_SET_KEYS = map { $_ => 1 } qw( slots poll_interval
   timeout max_request_time max_redirects
-  proxy_host proxy_port local_addr local_port ssl_options);
+  proxy_host proxy_port local_addr local_port ssl_options cookie_jar);
 
 sub _add_get_set_key {
     my $class = shift;
@@ -626,6 +630,12 @@ sub _process_in_progress {
             $response->request( $hashref->{request} );
             $response->previous( $hashref->{previous} ) if $hashref->{previous};
 
+            # Deal with cookies
+            my $jar = $self->_get_opt('cookie_jar', $id);
+            if ($jar) {
+                $jar->extract_cookies($response);
+            }
+
             # If it was a redirect and there are still redirects left
             # create a new request and unshift it onto the 'to_send'
             # array.
@@ -755,6 +765,12 @@ sub _send_request {
     my $uri = URI->new( $request->uri );
 
     my %args = ();
+
+    # Get cookies from jar if one exists
+    my $jar = $self->_get_opt('cookie_jar', $id);
+    if ($jar) {
+        $jar->add_cookie_header($request);
+    }
 
     # We need to use a different request_uri for proxied requests. Decide to use
     # this if a proxy port or host is set.

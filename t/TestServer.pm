@@ -86,6 +86,15 @@ sub handle_request {
         print "Trickled for '$trickle_for'.\n";
     }
 
+    elsif ( exists $params->{cookie} ) {
+        print $cgi->header(
+            -nph => 1,
+            -cookie => $cgi->cookie(-name => "x", value => "test"),
+        );
+
+        print "Sent test cookie\n";
+    }
+
     elsif ( exists $params->{bad_header} ) {
         my $headers = $cgi->header( -nph => 1, );
 
