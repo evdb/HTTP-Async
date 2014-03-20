@@ -4,3 +4,9 @@ perl:
   - "5.14"
   - "5.12"
   - "5.10"
+
+# Run all the tests
+env:
+  - REAL_SERVERS=1
+before_install:
+  - cpanm Sys::HostIP Test::CPAN::Changes
