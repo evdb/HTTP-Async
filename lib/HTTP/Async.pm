@@ -629,10 +629,17 @@ sub _process_in_progress {
             # If it was a redirect and there are still redirects left
             # create a new request and unshift it onto the 'to_send'
             # array.
+            # Only redirect GET and HEAD as per RFC  2616.
+            # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+            my $code = $response->code;
+            my $get_or_head = $response->request->method =~ m{^(?:GET|HEAD)$};
+
             if (
-                $response->is_redirect            # is a redirect
-                && $hashref->{redirects_left} > 0 # and we still want to follow
-                && $response->code != 304         # not a 'not modified' reponse
+                $response->is_redirect                     # is a redirect
+                && $hashref->{redirects_left} > 0          # and we still want to follow
+                && ($get_or_head || $code !~ m{^30[127]$}) # must be GET or HEAD if it's 301, 302 or 307
+                && $code != 304                            # not a 'not modified' reponse
+                && $code != 305                            # not a 'use proxy' response
               )
             {
 
@@ -646,8 +653,27 @@ sub _process_in_progress {
 
                 my $url = _make_url_absolute( url => $loc, ref => $uri );
 
-                my $headers = $response->request->headers;
-                my $request = HTTP::Request->new( 'GET', $url, $headers );
+                my $request = $response->request->clone;
+                $request->uri($url);
+
+                # These headers should never be forwarded
+                $request->remove_header('Host', 'Cookie');
+
+                # Don't leak private information.
+                # http://www.w3.org/Protocols/rfc2616/rfc2616-sec15.html#sec15.1.3
+                if ($request->header('Referer') &&
+                    $hashref->{request}->uri->scheme eq 'https' &&
+                    $request->uri->scheme eq 'http') {
+
+                    $request->remove_header('Referer');
+                }
+
+                # See Other should use GET
+                if ($code == 303 && !$get_or_head) {
+                    $request->method('GET');
+                    $request->content('');
+                    $request->remove_content_headers;
+                }
 
                 $self->_send_request( [ $request, $id ] );
                 $hashref->{previous} = $response;
