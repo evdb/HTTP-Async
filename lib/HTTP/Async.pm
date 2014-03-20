@@ -419,6 +419,65 @@ sub info {
     );
 }
 
+=head2 remove
+
+    $async->remove($id);
+    my $success = $async->remove($id);
+
+Removes the item with the given id no matter which state it is currently in. Returns true if an item is removed, and false otherwise.
+
+=cut
+
+sub remove {
+    my $self = shift;
+    my $id = shift;
+
+    my $hashref = delete $self->{in_progress}{$id};
+    if (!$hashref) {
+        for my $list ('to_send', 'to_return') {
+            my ($r_and_id) = grep { $_->[1] eq $id } @{ $self->{$list} };
+            $hashref = $r_and_id->[0];
+            if ($hashref) {
+                @{ $self->{$list} }
+                    = grep { $_->[1] ne $id } @{ $self->{$list} };
+            }
+        }
+    }
+    return if !$hashref;
+
+    my $s = $hashref->{handle};
+    $self->_io_select->remove($s);
+    delete $self->{id_opts}{$id};
+
+    return 1;
+}
+
+=head2 remove_all
+
+    $async->remove_all;
+    my $success = $async->remove_all;
+
+Removes all items no matter what states they are currently in. Returns true if any items are removed, and false otherwise.
+
+=cut
+
+sub remove_all {
+    my $self = shift;
+    return if $self->empty;
+
+    my @ids = (
+        (map { $_->[1] } @{ $self->{to_send} }),
+        (keys %{ $self->{in_progress} }),
+        (map { $_->[1] } @{ $self->{to_return} }),
+    );
+
+    for my $id (@ids) {
+        $self->remove($id);
+    }
+
+    return 1;
+}
+
 =head2 empty, not_empty
 
     while ( $async->not_empty ) { ...; }
