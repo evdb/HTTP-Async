@@ -20,17 +20,9 @@ TODOs for HTTP::Async
   * Switch to using Test::Class so that the tests are faster as they don't
     spend so much time starting and stopping the test server(s).
 
-  * Change tests so that the port used is chosen so as not to conflict with a
-    port that is already in use.
-
   * Change the user agent so that if it is not set in the request passed in then
     it defaults to 'HTTP::Async vx.xx' or some such. Should also be possible to
     set it in the opts or in the HTTP::Request.
 
   * Add 'info' sub that can be linked to SIGINFO to provide a summary of what is
     going on eg "print $async->info( 'terse' )".
-
-  * Add logic to TestServer::new() to choose a different port when it finds the
-    one it wants is already in use. Related: make tests which refer to port
-    numbers outside of their call to TestServer::new() get them from the
-    TestServer object instead of hard-coding them.

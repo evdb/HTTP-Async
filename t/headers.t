@@ -5,7 +5,7 @@ use Test::More tests => 3;
 use HTTP::Request;
 
 require 't/TestServer.pm';
-my $s        = TestServer->new(82000);
+my $s        = TestServer->new();
 my $url_root = $s->started_ok("starting a test server");
 
 use HTTP::Async;

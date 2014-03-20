@@ -12,7 +12,7 @@ if ($ENV{'REAL_SERVERS'}) {
 plan tests => $tests;
 
 require 't/TestServer.pm';
-my $s        = TestServer->new(80200);
+my $s        = TestServer->new();
 my $url_root = $s->started_ok("starting a test server");
 
 use HTTP::Async;

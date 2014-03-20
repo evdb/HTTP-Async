@@ -8,9 +8,14 @@ use base qw/Test::HTTP::Server::Simple HTTP::Server::Simple::CGI/;
 use Time::HiRes qw(sleep time);
 use Data::Dumper;
 use LWP::UserAgent;
+use Net::EmptyPort ();
 
 sub new {
     my ($class, $port) = @_;
+
+    if (!$port) {
+        $port = Net::EmptyPort::empty_port();
+    }
     
     # Require a port parameter to be passed in.
     # Any default here would mean the tests don't run properly in parallel.

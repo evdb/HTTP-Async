@@ -21,7 +21,7 @@ require 't/TestServer.pm';
 # keep in the to_send queue, HTTP::Async is too good at moving them into the
 # to_progress queue!
 {
-    my $s        = TestServer->new(84000);
+    my $s        = TestServer->new();
     my $url_root = $s->started_ok("starting a test server");
 
     my $q = HTTP::Async->new;
@@ -43,7 +43,7 @@ require 't/TestServer.pm';
 }
 
 {
-    my $s        = TestServer->new(84001);
+    my $s        = TestServer->new();
     my $url_root = $s->started_ok("starting a test server");
 
     my $q = HTTP::Async->new;

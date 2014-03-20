@@ -15,7 +15,7 @@ is $q->send_interval, 3, "new interval is 3 seconds";
 
 require 't/TestServer.pm';
 
-my @servers   = map { TestServer->new($_) } 80800 .. 80801;
+my @servers   = map { TestServer->new() } 1 .. 2;
 my @url_roots = ();
 
 foreach my $s (@servers) {

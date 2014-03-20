@@ -14,7 +14,7 @@ require 't/TestServer.pm';
 # my $s = TestServer->new;
 # my $url_root = $s->started_ok("starting a test server");
 
-my @servers = map { TestServer->new($_) } 80600 .. 80604;
+my @servers = map { TestServer->new() } 1 .. 4;
 foreach my $s (@servers) {
     my $url_root = $s->started_ok("starting a test server");
 }

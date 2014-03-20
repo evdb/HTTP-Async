@@ -24,6 +24,7 @@ WriteMakefile(
         'Time::HiRes'                => 0,
         'URI'                        => 0,
         'URI::Escape'                => 0,
+        'Net::EmptyPort'             => 0,
     },
     META_MERGE    => {
         resources => {

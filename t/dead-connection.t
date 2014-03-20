@@ -15,10 +15,11 @@ use HTTP::Async;
 use HTTP::Request;
 use IO::Socket::INET;
 use Time::HiRes;
+use Net::EmptyPort ();
 
 use Test::More tests => 10;
 
-my $port         = 9999;
+my $port         = Net::EmptyPort::empty_port();
 my $abort_period = 3;
 
 foreach my $arg_key (qw(timeout max_request_time)) {
