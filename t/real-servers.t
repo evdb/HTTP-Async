@@ -22,7 +22,7 @@ else {
 my @requests =
   map { HTTP::Request->new( GET => $_ ) }
   grep { $https_ok || $_ !~ m{^https://} }
-  sort qw( http://www.google.com http://www.yahoo.com https://www.gandi.net/ );
+  sort qw( http://www.google.com http://www.yahoo.com https://www.google.com );
 
 my $tests_per_request = 4;
 plan tests => 3 + $tests_per_request * scalar @requests;
@@ -41,8 +41,10 @@ my @responses = ();
 while ( $q->not_empty ) {
 
     my $res = $q->next_response;
+    my $uri;
     if ($res) {
-        pass "Got the response from " . $res->request->uri;
+        $uri = $res->request->uri;
+        pass "Got the response from $uri";
         push @responses, $res;
     }
     else {
@@ -50,7 +52,8 @@ while ( $q->not_empty ) {
         next;
     }
 
-    ok $res->is_success, "is success";
+    ok $res->is_success, "is success for $uri"
+        or diag $res->status_line;
 }
 
 # Check that we got the number needed and that all the responses are
