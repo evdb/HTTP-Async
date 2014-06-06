@@ -3,7 +3,7 @@ use warnings;
 
 package HTTP::Async;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Carp;
 use Data::Dumper;
@@ -944,6 +944,10 @@ Github user 'c00ler-' for adding LocalAddr and LocalPort support.
 rt.cpan.org user 'Florian (fschlich)' for typo in documentation.
 
 Heikki Vatiainen for the ssl_options support patch.
+
+Daniel Lintott of the Debian Perl Group for pointing out a test failure when
+using a very recent version of HTTP::Server::Simple to implement
+t/TestServer.pm
 
 =head1 BUGS AND REPO
 

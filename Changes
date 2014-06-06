@@ -1,5 +1,14 @@
 CHANGES to HTTP::Async
 
+0.26 2014/06/06
+
+  * Daniel Lintott of the Debian Perl Group reported that the HTTP::Async proxy
+    tests were broken with a development version of HTTP-Server-Simple (0.45_1)
+    I fixed the test, or rather fixed t/TestServer.pm, so that it would work
+    Thanks Daniel!
+  * While I was in there, I replaced some warn() calls in the tests with diag()
+    calls, to be a better TAP citizen
+
 0.25 2014/03/20
 
   * Added remove($id) and remove_all() methods
