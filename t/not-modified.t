@@ -19,9 +19,6 @@ my $q = HTTP::Async->new;
     ok $q->add($req), "Added request to the queue";
     my $res = $q->wait_for_next_response;
 
-    #    use Data::Dumper;
-    #    warn Dumper $res;
-
     is $res->code, 304, "304 Not modified";
     ok !$res->previous, "does not have a previous reponse";
 }

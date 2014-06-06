@@ -45,9 +45,6 @@ sub handle_request {
     # trickle tests.
     $self->stdout_handle->autoflush(1);
 
-     # warn "START REQUEST - " . time;
-     # warn Dumper($params);
-
     # Do the right thing depending on what is asked of us.
     if ( exists $params->{redirect} ) {
         my $num = $params->{redirect} || 0;

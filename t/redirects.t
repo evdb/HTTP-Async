@@ -29,9 +29,6 @@ is $q->max_redirects, 7, "max_redirects == 7";
 {    # Check that a couple of redirects work.
     my $url = "$url_root/foo/bar?redirect=3";
 
-    # warn $url;
-    # getc;
-
     my $req = HTTP::Request->new( 'GET', $url );
     ok $q->add($req), "Added request to the queue";
     $q->poke while !$q->to_return_count;

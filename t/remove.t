@@ -3,6 +3,8 @@ use warnings;
 
 use Test::More tests => 21;
 
+use Data::Dumper;
+
 use HTTP::Request;
 use HTTP::Async;
 
@@ -82,8 +84,7 @@ sub populate_queues {
         }
 
         if (!$q->to_return_count) {
-            use Data::Dumper;
-            warn Dumper $q;
+            diag Dumper $q;
         }
 
         is $q->to_return_count, 1, "to_return_count is one";

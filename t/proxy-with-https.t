@@ -44,7 +44,7 @@ while ( my ( $url, $code ) = each %tests ) {
 
     my $res = $q->wait_for_next_response;
     is( $res->code, $code, "Got a '$code' response" )
-        || warn $res->as_string;
+        || diag $res->as_string;
 
     # check that the proxy header was found if this was a proxy request.
     my $proxy_header = $res->header('WasProxied') || '';
