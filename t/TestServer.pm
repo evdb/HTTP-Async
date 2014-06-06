@@ -167,4 +167,26 @@ sub act_as_proxy {
     return 1;
 }
 
+# To allow act_as_proxy to work with HTTP::Server::Simple::CGI versions above
+# 0.41_1, where better support for RFC1616 was added, we have to override the
+# parse_request() method to match the pre-0.45_1 version of the method. Lame
+# and hacky but it works.
+sub parse_request {
+    my $self = shift;
+    my $chunk;
+    while ( sysread( STDIN, my $buff, 1 ) ) {
+        last if $buff eq "\n";
+        $chunk .= $buff;
+    }
+    defined($chunk) or return undef;
+    $_ = $chunk;
+
+    m/^(\w+)\s+(\S+)(?:\s+(\S+))?\r?$/;
+    my $method   = $1 || '';
+    my $uri      = $2 || '';
+    my $protocol = $3 || '';
+
+    return ( $method, $uri, $protocol );
+}
+
 1;
