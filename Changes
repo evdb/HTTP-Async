@@ -1,5 +1,10 @@
 CHANGES to HTTP::Async
 
+0.27 2014/11/17
+
+  * Github user acferen finally patched the long-standing timeout bug
+    Thanks acferen!
+
 0.26 2014/06/06
 
   * Daniel Lintott of the Debian Perl Group reported that the HTTP::Async proxy
