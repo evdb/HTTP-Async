@@ -1,5 +1,10 @@
 CHANGES to HTTP::Async
 
+0.28 2015/03/09
+
+  * Allow manual override of PeerAddr via peer_addr (rt #102634)
+  * Switch from print() to note() in TestServer for test suite
+
 0.27 2014/11/17
 
   * Github user acferen finally patched the long-standing timeout bug
