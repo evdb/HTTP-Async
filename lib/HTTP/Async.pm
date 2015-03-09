@@ -92,6 +92,7 @@ However in some circumstances you might wish to change these.
        local_port:  ''
        ssl_options: {}
        cookie_jar:  undef
+       peer_addr:   ''
 
 If defined, is expected to be similar to C<HTTP::Cookies>, with extract_cookies and add_cookie_header methods.
        
@@ -143,7 +144,7 @@ sub _init {
 
 sub _next_id { return ++$_[0]->{current_id} }
 
-=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host, proxy_port, local_addr, local_port, ssl_options, cookie_jar
+=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host, proxy_port, local_addr, local_port, ssl_options, cookie_jar, peer_addr
 
     $old_value = $async->slots;
     $new_value = $async->slots( $new_value );
@@ -157,7 +158,7 @@ Slots is the maximum number of parallel requests to make.
 
 my %GET_SET_KEYS = map { $_ => 1 } qw( slots poll_interval
   timeout max_request_time max_redirects
-  proxy_host proxy_port local_addr local_port ssl_options cookie_jar);
+  proxy_host proxy_port local_addr local_port ssl_options cookie_jar peer_addr);
 
 sub _add_get_set_key {
     my $class = shift;
@@ -794,7 +795,13 @@ sub _send_request {
       : 0;                                      # ...otherwise not
 
     # If we did not get a setting from the proxy then use the uri values.
+
     $args{PeerAddr} ||= $uri->host;
+    my $peer_address = $self->_get_opt('peer_addr', $id );
+    if($peer_address) {
+        $args{PeerAddr} = $peer_address;
+    }
+
     $args{PeerPort} ||= $uri->port;
 
     my $net_http_class = 'Net::HTTP::NB';
