@@ -7,6 +7,7 @@ use base qw/Test::HTTP::Server::Simple HTTP::Server::Simple::CGI/;
 
 use Time::HiRes qw(sleep time);
 use Data::Dumper;
+use Test::More;
 use LWP::UserAgent;
 use Net::EmptyPort ();
 
@@ -184,6 +185,19 @@ sub parse_request {
     my $protocol = $3 || '';
 
     return ( $method, $uri, $protocol );
+}
+
+# Change print() to note() in HTTP::Server::Simple::print_banner
+sub print_banner {
+    my $self = shift;
+
+    note(
+        ref($self)
+        . ": You can connect to your server at "
+        . "http://localhost:"
+        . $self->port
+        . "/"
+    );
 }
 
 1;
