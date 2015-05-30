@@ -21,6 +21,7 @@ WriteMakefile(
         'Net::HTTPS::NB'             => 0.13,
         'Test::HTTP::Server::Simple' => 0,
         'Test::More'                 => 0,
+        'Test::Fatal'                => 0,
         'Time::HiRes'                => 0,
         'URI'                        => 0,
         'URI::Escape'                => 0,
