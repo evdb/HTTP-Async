@@ -1,5 +1,10 @@
 CHANGES to HTTP::Async
 
+0.29 2015/05/30
+
+  * Make add_with_opts throw error on invalid options
+    Thanks Tom Grimwood-Taylor (tgt)!
+
 0.28 2015/03/09
 
   * Allow manual override of PeerAddr via peer_addr (rt #102634)
