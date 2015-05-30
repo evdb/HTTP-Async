@@ -28,4 +28,5 @@ t/template.t
 t/test-utils.pl
 t/TestServer.pm
 t/timeout.t
+t/invalid-options.t
 TODO
