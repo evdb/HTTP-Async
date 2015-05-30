@@ -231,13 +231,20 @@ This method lets you add a single request to the queue with options that
 differ from the defaults. For example you might wish to set a longer timeout
 or to use a specific proxy. Returns the id of the request.
 
+The method croaks when passed an invalid option.
+
 =cut
 
 sub add_with_opts {
     my $self = shift;
     my $req  = shift;
     my $opts = shift;
-    my $id   = $self->_next_id;
+
+    for my $key (keys %{$opts}) {
+        croak "$key not valid for add_with_opts" unless $GET_SET_KEYS{$key};
+    }
+
+    my $id = $self->_next_id;
 
     push @{ $$self{to_send} }, [ $req, $id ];
     $self->{id_opts}{$id} = $opts;
