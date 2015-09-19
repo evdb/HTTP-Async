@@ -18,8 +18,8 @@ my $url_root = $s->started_ok("starting a test server");
 use HTTP::Async;
 my $q = HTTP::Async->new;
 
-# Check that the max_redirects is at a sensible level.
-is $q->max_redirects, 7, "max_redirects == 7";
+# Check that the max_redirect is at a sensible level.
+is $q->max_redirect, 7, "max_redirect == 7";
 
 # Send a request to somewhere that will redirect a certain number of
 # times:
@@ -55,7 +55,7 @@ is $q->max_redirects, 7, "max_redirects == 7";
 
 {    # Set the max_redirect higher and try again.
 
-    ok $q->max_redirects(30), "Set the max_redirects higher.";
+    ok $q->max_redirect(30), "Set the max_redirect higher.";
 
     my $url = "$url_root?redirect=20";
     my $req = HTTP::Request->new( 'GET', $url );
@@ -70,8 +70,8 @@ is $q->max_redirects, 7, "max_redirects == 7";
 
 {    # Set the max_redirect to zero and check that none happen.
 
-    is $q->max_redirects(0), 0, "Set the max_redirects to zero.";
-    is $q->max_redirects, 0, "max_redirects is set to zero.";
+    is $q->max_redirect(0), 0, "Set the max_redirect to zero.";
+    is $q->max_redirect, 0, "max_redirect is set to zero.";
 
     my $url = "$url_root?redirect=20";
     my $req = HTTP::Request->new( 'GET', $url );
@@ -87,8 +87,8 @@ if ($ENV{'REAL_SERVERS'}) {
     # Check that redirects have their headers repeated
     # Exmaple from kloevschall (https://github.com/evdb/HTTP-Async/issues/8)
 
-    is $q->max_redirects(1), 1, "Set the max_redirects to one.";
-    is $q->max_redirects, 1, "max_redirects is set to one.";
+    is $q->max_redirect(1), 1, "Set the max_redirect to one.";
+    is $q->max_redirect, 1, "max_redirect is set to one.";
 
     my $headers = HTTP::Headers->new(Accept => 'application/x-research-info-systems');
 
