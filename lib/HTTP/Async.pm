@@ -84,7 +84,7 @@ However in some circumstances you might wish to change these.
             slots:  20
           timeout:  180 (seconds)
  max_request_time:  300 (seconds)
-    max_redirects:  7
+    max_redirect:   7
     poll_interval:  0.05 (seconds)
        proxy_host:  ''
        proxy_port:  ''
@@ -95,6 +95,9 @@ However in some circumstances you might wish to change these.
        peer_addr:   ''
 
 If defined, is expected to be similar to C<HTTP::Cookies>, with extract_cookies and add_cookie_header methods.
+
+The option max_redirects has been renamed to max_redirect to be consistent with LWP::UserAgent, although max_redirects still works.
+
        
 =head1 METHODS
 
@@ -113,7 +116,7 @@ sub new {
 
         opts => {
             slots            => 20,
-            max_redirects    => 7,
+            max_redirect     => 7,
             timeout          => 180,
             max_request_time => 300,
             poll_interval    => 0.05,
@@ -144,7 +147,7 @@ sub _init {
 
 sub _next_id { return ++$_[0]->{current_id} }
 
-=head2 slots, timeout, max_request_time, poll_interval, max_redirects, proxy_host, proxy_port, local_addr, local_port, ssl_options, cookie_jar, peer_addr
+=head2 slots, timeout, max_request_time, poll_interval, max_redirect, proxy_host, proxy_port, local_addr, local_port, ssl_options, cookie_jar, peer_addr
 
     $old_value = $async->slots;
     $new_value = $async->slots( $new_value );
@@ -157,7 +160,7 @@ Slots is the maximum number of parallel requests to make.
 =cut
 
 my %GET_SET_KEYS = map { $_ => 1 } qw( slots poll_interval
-  timeout max_request_time max_redirects
+  timeout max_request_time max_redirect
   proxy_host proxy_port local_addr local_port ssl_options cookie_jar peer_addr);
 
 sub _add_get_set_key {
@@ -166,10 +169,15 @@ sub _add_get_set_key {
     $GET_SET_KEYS{$key} = 1;
 }
 
+my %KEY_ALIASES = ( max_redirects => 'max_redirect' );
+
 sub _get_opt {
     my $self = shift;
     my $key  = shift;
     my $id   = shift;
+
+    $key = $KEY_ALIASES{$key} if exists $KEY_ALIASES{$key};
+
     die "$key not valid for _get_opt" unless $GET_SET_KEYS{$key};
 
     # If there is an option set for this id then use that, otherwise fall back
@@ -184,6 +192,9 @@ sub _get_opt {
 sub _set_opt {
     my $self = shift;
     my $key  = shift;
+
+    $key = $KEY_ALIASES{$key} if exists $KEY_ALIASES{$key};
+
     die "$key not valid for _set_opt" unless $GET_SET_KEYS{$key};
     $self->{opts}{$key} = shift if @_;
     return $self->{opts}{$key};
@@ -881,7 +892,7 @@ sub _send_request {
     $entry->{finish_by}  = $time + $self->_get_opt( 'max_request_time', $id );
     $entry->{handle}     = $s;
 
-    $entry->{redirects_left} = $self->_get_opt( 'max_redirects', $id )
+    $entry->{redirects_left} = $self->_get_opt( 'max_redirect', $id )
       unless exists $entry->{redirects_left};
 
     return 1;
