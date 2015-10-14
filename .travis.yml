@@ -12,7 +12,3 @@ env:
   - REAL_SERVERS=1
 before_install:
   - cpanm Sys::HostIP Test::CPAN::Changes
-
-# Use new container-based infrastructure by declaring that we don't need sudo
-# http://docs.travis-ci.com/user/migrating-from-legacy/
-sudo: false
