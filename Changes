@@ -4,6 +4,7 @@ CHANGES to HTTP::Async
   * Add minimum Perl version to Makefile.PL
   * Match HTTP::Async::Polite version to HTTP::Async (CPANTS)
     Thanks to Mohammad S Anwar (Manwar) for both changes!
+  * Replace yahoo.com with metacpan.org in t/real_servers.t
 
 0.30 2015/05/30
   * Allow max_redirect or max_redirects, to be consistent with LWP::UserAgent
