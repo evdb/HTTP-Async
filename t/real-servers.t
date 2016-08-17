@@ -22,7 +22,7 @@ else {
 my @requests =
   map { HTTP::Request->new( GET => $_ ) }
   grep { $https_ok || $_ !~ m{^https://} }
-  sort qw( http://www.google.com http://www.yahoo.com https://www.google.com );
+  sort qw( http://www.google.com https://metacpan.org https://www.google.com );
 
 my $tests_per_request = 4;
 plan tests => 3 + $tests_per_request * scalar @requests;
