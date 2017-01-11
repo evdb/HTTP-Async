@@ -176,7 +176,7 @@ sub parse_request {
         last if $buff eq "\n";
         $chunk .= $buff;
     }
-    defined($chunk) or return undef;
+    defined($chunk) or return;
     $_ = $chunk;
 
     m/^(\w+)\s+(\S+)(?:\s+(\S+))?\r?$/;
