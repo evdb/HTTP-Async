@@ -13,7 +13,9 @@ is $q->send_interval, 5, "default interval is 5 seconds";
 ok $q->send_interval(3), "change interval to 3 seconds";
 is $q->send_interval, 3, "new interval is 3 seconds";
 
-require 't/TestServer.pm';
+use FindBin;
+use lib "$FindBin::Bin";
+require TestServer;
 
 my @servers   = map { TestServer->new() } 1 .. 2;
 my @url_roots = ();

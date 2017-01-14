@@ -9,7 +9,9 @@ plan skip_all => "enable these tests by setting REAL_SERVERS"
 
 use HTTP::Request;
 
-require 't/TestServer.pm';
+use FindBin;
+use lib "$FindBin::Bin";
+require TestServer;
 
 eval "require LWP::Protocol::https";
 if ($@) {

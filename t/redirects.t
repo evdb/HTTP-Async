@@ -11,7 +11,10 @@ if ($ENV{'REAL_SERVERS'}) {
 }
 plan tests => $tests;
 
-require 't/TestServer.pm';
+use FindBin;
+use lib "$FindBin::Bin";
+require TestServer;
+
 my $s        = TestServer->new();
 my $url_root = $s->started_ok("starting a test server");
 

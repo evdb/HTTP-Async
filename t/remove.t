@@ -10,7 +10,10 @@ use HTTP::Async;
 
 ## Set up - create an Async object with ten items in its queue
 
-require 't/TestServer.pm';
+use FindBin;
+use lib "$FindBin::Bin";
+require TestServer;
+
 # To ensure that remove and remove_all work on all three states, we need to
 # have items in all three states when we call them.
 #
