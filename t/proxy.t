@@ -6,7 +6,10 @@ use URI::Escape;
 use Test::More tests => 16;
 use HTTP::Request;
 
-require 't/TestServer.pm';
+use FindBin;
+use lib "$FindBin::Bin";
+require TestServer;
+
 my $s1          = TestServer->new();
 my $s1_url_root = $s1->started_ok("starting a test server");
 
