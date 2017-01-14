@@ -5,7 +5,11 @@ use Test::More;
 use HTTP::Request;
 use Net::EmptyPort;
 
-unless(eval("require Sys::HostIP;") && !$@) {
+my $rc = eval {
+    require Sys::HostIP;
+    1;
+};
+if (!$rc) {
     plan skip_all => "test requires Sys::HostIP to be installed";
     exit;
 }
