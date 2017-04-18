@@ -834,6 +834,9 @@ sub _send_request {
         # Add SSL options, if any, to args
         my $ssl_options = $self->_get_opt('ssl_options');
         @args{ keys %$ssl_options } = values %$ssl_options if $ssl_options;
+
+        # Override global SSL options with request-specific ones, if any
+        @args{ keys %{$args{ssl_opts}} } = values %{$args{ssl_opts}} if $args{ssl_opts};
     }
     elsif($uri->scheme and $uri->scheme eq 'https' and $request_is_to_proxy) {
         # We are making an HTTPS request through an HTTP proxy such as squid.
