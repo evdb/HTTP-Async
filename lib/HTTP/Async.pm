@@ -13,6 +13,8 @@ use Net::HTTP::NB;
 use Net::HTTP;
 use URI;
 use Time::HiRes qw( time sleep );
+use Errno qw( EWOULDBLOCK EAGAIN ETIMEDOUT EINTR );
+use IO::Socket::SSL;
 
 =head1 NAME
 
@@ -541,6 +543,80 @@ sub DESTROY {
     return;
 }
 
+#Handles timeout processing for a given http reguest
+#Returns 1 if timeout expipres. Calcultes next timeout_at
+sub _handle_timeout {
+  my $self = shift;
+  my $hashref = shift;
+
+  my $id = $hashref->{id};
+  my $s = $hashref->{handle};
+
+  # Check that we have not timed-out.
+  if (   time > $hashref->{timeout_at}
+    || time > $hashref->{finish_by} ) {
+    # warn sprintf "Timeout: %.3f > %.3f",    #
+    #   time, $hashref->{timeout_at};
+
+    $self->_add_error_response_to_return(
+      id       => $id,
+      code     => 504,
+      request  => $hashref->{request},
+      previous => $hashref->{previous},
+      content  => 'Timed out',
+    );
+
+    $self->_remove_io_select($s);
+    delete $$self{fileno_to_id}{ $s->fileno };
+    return 1;
+  }
+
+
+  return 0;
+}
+
+#Handles async ssl connection. Should be called repeatedly until ssl connection is fully established
+sub _handle_ssl {
+  my $self = shift;
+  my $hashref = shift;
+
+  my $id = $hashref->{id};
+  my $s = $hashref->{handle};
+  my $reset_timeout = 0;
+
+  if (defined($s->connect_SSL()))
+  {
+    $hashref->{ssl_connected} = 1;
+    $self->_write_request($hashref);
+    $reset_timeout = 1;
+    $self->_io_write_select->remove($s); # remove from write only
+  }
+  elsif ($! == EWOULDBLOCK)
+  {
+  }
+  else
+  {
+    $self->{log}->msg("_process_in_progress(): ssl_connected=0, error=$!");
+
+    $self->_add_error_response_to_return(
+      'code'     => 503,
+      'content'  => $@,
+      'id'       => $id,
+      'request'  => $hashref->{request},
+      'previous' => $hashref->{previous}
+    );
+    $self->_remove_io_select($s);
+    delete $$self{fileno_to_id}{ $s->fileno };
+  }
+
+  if ( $reset_timeout )
+  {
+    # Reset the timeout.
+    $hashref->{timeout_at} = time + $self->_get_opt( 'timeout', $id );
+    # warn "recieved - timeout set to '$hashref->{timeout_at}'";
+  }
+}
+
 # Go through all the values on the select list and check to see if
 # they have been fully received yet.
 
@@ -548,7 +624,31 @@ sub _process_in_progress {
     my $self     = shift;
     my %seen_ids = ();
 
-  HANDLE:
+  HANDLE_WRITE:
+    foreach my $s ($self->_io_write_select->can_write(0))
+    {
+        my $id = $self->{fileno_to_id}{ $s->fileno }
+          || die "INTERNAL ERROR: could not got id for fileno";
+        $seen_ids{$id}++;
+
+        my $hashref = $$self{in_progress}{$id};
+
+        # only pending ssl connection requires writes
+        if ( !defined($hashref->{ssl_connected}) || $hashref->{ssl_connected} )
+        {
+          # FIXME: possible error here?
+          next HANDLE_WRITE;
+        }
+
+        if ($self->_handle_timeout($hashref))
+        {
+          next HANDLE_WRITE;
+        }
+
+        $self->_handle_ssl($hashref);
+    }
+
+  HANDLE_READ:
     foreach my $s ( $self->_io_select->can_read(0) ) {
 
         # Get the id and add it to the hash of seen ids so we don't check it
@@ -562,25 +662,17 @@ sub _process_in_progress {
 
         # warn Dumper $hashref;
 
-        # Check that we have not timed-out.
-        if (   time > $hashref->{timeout_at}
-            || time > $hashref->{finish_by} )
+        if ($self->_handle_timeout($hashref))
         {
+          next HANDLE_READ;
+        }
 
-            # warn sprintf "Timeout: %.3f > %.3f",    #
-            #   time, $hashref->{timeout_at};
+        # only pending ssl connection requires writes
+        if (defined($hashref->{ssl_connected}) && !$hashref->{ssl_connected} )
+        {
+          $self->_handle_ssl($hashref);
 
-            $self->_add_error_response_to_return(
-                id       => $id,
-                code     => 504,
-                request  => $hashref->{request},
-                previous => $hashref->{previous},
-                content  => 'Timed out',
-            );
-
-            $self->_io_select->remove($s);
-            delete $$self{fileno_to_id}{ $s->fileno };
-            next HANDLE;
+          next HANDLE_READ;
         }
 
         # If there is a code then read the body.
@@ -614,9 +706,9 @@ sub _process_in_progress {
                     'request'  => $hashref->{request},
                     'previous' => $hashref->{previous}
                 );
-                $self->_io_select->remove($s);
+                $self->_remove_io_select($s);
                 delete $$self{fileno_to_id}{ $s->fileno };
-                next HANDLE;
+                next HANDLE_READ;
             }
 
             if ($code) {
@@ -639,7 +731,7 @@ sub _process_in_progress {
         # to 'to_return';
         if ( $$tmp{is_complete} ) {
             delete $$self{fileno_to_id}{ $s->fileno };
-            $self->_io_select->remove($s);
+            $self->_remove_io_select($s);
 
             # warn Dumper $$hashref{content};
 
@@ -746,7 +838,7 @@ sub _process_in_progress {
             );
 
             my $s = $hashref->{handle};
-            $self->_io_select->remove($s);
+            $self->_remove_io_select($s);
             delete $$self{fileno_to_id}{ $s->fileno };
         }
     }
@@ -823,8 +915,11 @@ sub _send_request {
     $args{PeerPort} ||= $uri->port;
 
     my $net_http_class = 'Net::HTTP::NB';
+    my $ssl_en = 0;
     if ($uri->scheme and $uri->scheme eq 'https' and not $request_is_to_proxy) {
         $net_http_class = 'Net::HTTPS::NB';
+        $args{Blocking} = 0;
+        $ssl_en = 1;
         eval {
             require Net::HTTPS::NB;
             Net::HTTPS::NB->import();
@@ -845,11 +940,10 @@ sub _send_request {
         );
     }
     my $s = eval { $net_http_class->new(%args) };
-
     # We could not create a request - fake up a 503 response with
     # error as content.
-    if ( !$s ) {
-
+    if (!$s || ( $ssl_en && ( defined($s->connect_SSL()) || $! != EWOULDBLOCK) ) )
+    {
         $self->_add_error_response_to_return(
             id       => $id,
             code     => 503,
@@ -861,20 +955,10 @@ sub _send_request {
         return 1;
     }
 
-    my %headers;
-    for my $key ($request->{_headers}->header_field_names) {
-        $headers{$key} = $request->header($key);
-    }
-
     # Decide what to use as the request_uri
     my $request_uri = $request_is_to_proxy    # is this a proxy request....
       ? $uri->as_string                       # ... if so use full url
       : _strip_host_from_uri($uri);    # ...else strip off scheme, host and port
-
-    croak "Could not write request to $uri '$!'"
-      unless $s->write_request( $request->method, $request_uri, %headers,
-        $request->content );
-
     $self->_io_select->add($s);
 
     my $time = time;
@@ -882,9 +966,15 @@ sub _send_request {
 
     $$self{fileno_to_id}{ $s->fileno } = $id;
 
+    $entry->{request_uri} = $request_uri;
     $entry->{request}    = $request;
     $entry->{started_at} = $time;
+    $entry->{id} = $id;
 
+    # udnef: no ssl, http
+    # 0: ssl https, conenction is not fully established yet
+    # 1: ssl https, connection is ready, possible to conitnue with send_request
+    $entry->{ssl_connected} = $ssl_en ? 0 : undef;
     
     $entry->{timeout_at} = $time + $self->_get_opt( 'timeout', $id );
     # warn "sent - timeout set to '$entry->{timeout_at}'";
@@ -895,7 +985,34 @@ sub _send_request {
     $entry->{redirects_left} = $self->_get_opt( 'max_redirect', $id )
       unless exists $entry->{redirects_left};
 
+    if ( $ssl_en ) {
+      $self->_io_write_select->add($s); # only add SSL requests to the can_write IO select
+    }
+    else {
+      $self->_write_request($entry);
+    }
+
     return 1;
+}
+
+#write_request is called after ssl_connection is fully established to transmit an http request over the ssl
+sub _write_request {
+    my $this = shift;
+    my $entry = shift;
+
+    my $request = $entry->{request};
+    
+    my %headers;
+    for my $key ($request->{_headers}->header_field_names) {
+        $headers{$key} = $request->header($key);
+    }
+
+    # Decide what to use as the request_uri
+    my $request_uri = $entry->{request_uri};
+
+    croak "Could not write request to @{[$request->uri]} '$!'"
+      unless $entry->{handle}->write_request( $request->method, $request_uri, %headers,
+        $request->content );
 }
 
 sub _strip_host_from_uri {
@@ -913,6 +1030,17 @@ sub _strip_host_from_uri {
 sub _io_select {
     my $self = shift;
     return $$self{io_select} ||= IO::Select->new();
+}
+
+sub _io_write_select {
+    my $self = shift;
+    return $$self{io_write_select} ||= IO::Select->new();
+}
+
+sub _remove_io_select {
+    my ($self,$s) = @_;
+    $self->_io_select->remove($s);
+    $self->_io_write_select->remove($s);
 }
 
 sub _make_url_absolute {
